@@ -1,95 +1,103 @@
 import { contact } from "../Models/Contact.js";
 
-// get contact
+// GET /api/contact  — only the logged-in user's contacts
 export const getAllContact = async (req, res) => {
-    const userContact = await contact.find();
-    if (!userContact)
-        return res.json({ message: "No contacts exist", success: false });
-
-    res.json({ message: "All contacts fetched", userContact });
+    const userContact = await contact.find({ user: req.user._id });
+    if (userContact.length === 0) {
+        return res.status(404).json({ message: "No contacts exist", success: false });
+    }
+    return res.json({ message: "All contacts fetched", userContact, success: true });
 };
 
-// Create new contact
+// POST /api/contact/new
 export const newContact = async (req, res) => {
     const { name, email, phone, type } = req.body;
-    if (!name || !email || !phone || !type)
-        return res.json({ message: "All fields are required", success: false });
+    if (!name || !email || !phone || !type) {
+        return res.status(400).json({ message: "All fields are required", success: false });
+    }
 
-    let saveContact = await contact.create({
+    const saveContact = await contact.create({
         name,
         email,
         phone,
         type,
-        user: req.user
+        user: req.user._id,                 // store id, not the whole doc
     });
 
-    res.json({
+    return res.status(201).json({
         message: "Contact saved successfully",
         saveContact,
         success: true,
     });
-    
 };
 
-// update contact by id
+// PUT /api/contact/:id  — only owner can update
 export const updateContactById = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
     const { name, email, phone, type } = req.body;
 
-    let updatedContact = await contact.findByIdAndUpdate(
+    const existing = await contact.findById(id);
+    if (!existing) {
+        return res.status(404).json({ message: "No contact exists", success: false });
+    }
+    if (!existing.user.equals(req.user._id)) {
+        return res.status(403).json({ message: "Forbidden", success: false });
+    }
+
+    const updatedContact = await contact.findByIdAndUpdate(
         id,
-        {
-            name,
-            email,
-            phone,
-            type,
-        },
-        { new: true },
+        { name, email, phone, type },
+        { new: true }
     );
-    if (!updatedContact) return res.json({ message: "No contact exist ", success: false });
 
-
-    res.json({ message: "Contact updated successfully", updatedContact,success: true });
-
-
+    return res.json({
+        message: "Contact updated successfully",
+        updatedContact,
+        success: true,
+    });
 };
 
-// delete contact by id
+// DELETE /api/contact/:id  — only owner can delete
 export const deleteContactById = async (req, res) => {
-    const id = req.params.id;
-    
+    const { id } = req.params;
 
-    let deleteContact = await contact.findByIdAndDelete(id);
+    const existing = await contact.findById(id);
+    if (!existing) {
+        return res.status(404).json({ message: "No contact exists", success: false });
+    }
+    if (!existing.user.equals(req.user._id)) {
+        return res.status(403).json({ message: "Forbidden", success: false });
+    }
 
-        
-
-    if (!deleteContact) return res.json({ message: "No contact exist ", success: false });
-
-
-    res.json({ message: "Contact deleted successfully", success: true });
-
-
+    await contact.findByIdAndDelete(id);
+    return res.json({ message: "Contact deleted successfully", success: true });
 };
 
-// get contact by id
+// GET /api/contact/:id  — only owner can read
 export const getContactById = async (req, res) => {
-    const id = req.params.id;
-    const userContact = await contact.findById(id);
-
-    if (!userContact)
-        return res.json({ message: "No contact found", success: false });
-
-    res.json({ message: "Contacts are fetched ", userContact, success: true });
+    const userContact = await contact.findById(req.params.id);
+    if (!userContact) {
+        return res.status(404).json({ message: "No contact found", success: false });
+    }
+    if (!userContact.user.equals(req.user._id)) {
+        return res.status(403).json({ message: "Forbidden", success: false });
+    }
+    return res.json({ message: "Contact fetched", userContact, success: true });
 };
 
-
-// get contact by userid
+// GET /api/contact/userid/:id  — only the same user
 export const getContactByUserId = async (req, res) => {
-    const id = req.params.id;
-    const userContact = await contact.find({user:id});
+    if (req.params.id !== String(req.user._id)) {
+        return res.status(403).json({ message: "Forbidden", success: false });
+    }
 
-    if (!userContact)
-        return res.json({ message: "No contact found", success: false });
-
-    res.json({ message: "User specific Contacts are fetched ", userContact, success: true });
+    const userContact = await contact.find({ user: req.params.id });
+    if (userContact.length === 0) {
+        return res.status(404).json({ message: "No contact found", success: false });
+    }
+    return res.json({
+        message: "User specific contacts fetched",
+        userContact,
+        success: true,
+    });
 };
