@@ -1,21 +1,35 @@
 import express from "express";
 import {
-    deleteContactById,
-    getAllContact,
-    getContactById,
-    getContactByUserId,
-    newContact,
-    updateContactById,
+  deleteContactById,
+  getAllContact,
+  getContactById,
+  getContactByUserId,
+  newContact,
+  updateContactById,
 } from "../Controllers/contact.js";
-import { isAuthenticated } from "../Middlewares/Auth.js";
+import { isAthenticated } from "../Middlewares/Auth.js";
 
 const router = express.Router();
 
-router.post("/new", isAuthenticated, newContact);
-router.get("/", isAuthenticated, getAllContact);
-router.get("/userid/:id", isAuthenticated, getContactByUserId); // before /:id
-router.get("/:id", isAuthenticated, getContactById);
-router.put("/:id", isAuthenticated, updateContactById);
-router.delete("/:id", isAuthenticated, deleteContactById);
+// new contact
+// @api dsc :- creating contact
+// @api method :- post
+// @api endPoint :- /api/contact/new
+router.post("/new", isAthenticated, newContact);
+
+// get all contact
+router.get("/", getAllContact);
+
+// get contact by id
+router.get("/:id", getContactById);
+
+// update contact by id
+router.put("/:id",isAthenticated, updateContactById);
+
+// delete contact by id
+router.delete("/:id",isAthenticated, deleteContactById);
+
+// get user specific contact
+router.get("/userid/:id",getContactByUserId);
 
 export default router;

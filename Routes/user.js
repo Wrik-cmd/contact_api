@@ -1,21 +1,21 @@
 import express from 'express'
-import { register ,login} from '../Controllers/user.js';
+import { register,login } from '../Controllers/user.js';
 
 const router = express.Router();
 
-// User register
-// @api dsc :- User register
-// @api method:-post
-// @api endpoint:- /api/user/register
-
+// user register
+// @api dsc :- user register
+// @api method :- post
+// @api endPoint :- /api/user/register
 router.post('/register',register)
 
-// User Login
-// @api dsc :- User Login
-// @api method:-post
-// @api endpoint:- /api/user/login
-
+// user login
+// @api dsc :- user login
+// @api method :- post
+// @api endPoint :- /api/user/login
 router.post('/login',login)
 
-export default router;
 
+
+
+export default router
