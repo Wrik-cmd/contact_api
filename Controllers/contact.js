@@ -1,8 +1,8 @@
-import { contact } from "../Models/Contact.js";
+import { Contact } from "../Models/Contact.js";
 
 // GET /api/contact  — only the logged-in user's contacts
 export const getAllContact = async (req, res) => {
-    const userContact = await contact.find({ user: req.user._id });
+    const userContact = await Contact.find({ user: req.user._id });
     if (userContact.length === 0) {
         return res.status(404).json({ message: "No contacts exist", success: false });
     }
@@ -16,7 +16,7 @@ export const newContact = async (req, res) => {
         return res.status(400).json({ message: "All fields are required", success: false });
     }
 
-    const saveContact = await contact.create({
+    const saveContact = await Contact.create({
         name,
         email,
         phone,
@@ -36,7 +36,7 @@ export const updateContactById = async (req, res) => {
     const { id } = req.params;
     const { name, email, phone, type } = req.body;
 
-    const existing = await contact.findById(id);
+    const existing = await Contact.findById(id);
     if (!existing) {
         return res.status(404).json({ message: "No contact exists", success: false });
     }
@@ -44,7 +44,7 @@ export const updateContactById = async (req, res) => {
         return res.status(403).json({ message: "Forbidden", success: false });
     }
 
-    const updatedContact = await contact.findByIdAndUpdate(
+    const updatedContact = await Contact.findByIdAndUpdate(
         id,
         { name, email, phone, type },
         { new: true }
@@ -61,7 +61,7 @@ export const updateContactById = async (req, res) => {
 export const deleteContactById = async (req, res) => {
     const { id } = req.params;
 
-    const existing = await contact.findById(id);
+    const existing = await Contact.findById(id);
     if (!existing) {
         return res.status(404).json({ message: "No contact exists", success: false });
     }
@@ -69,13 +69,13 @@ export const deleteContactById = async (req, res) => {
         return res.status(403).json({ message: "Forbidden", success: false });
     }
 
-    await contact.findByIdAndDelete(id);
+    await Contact.findByIdAndDelete(id);
     return res.json({ message: "Contact deleted successfully", success: true });
 };
 
 // GET /api/contact/:id  — only owner can read
 export const getContactById = async (req, res) => {
-    const userContact = await contact.findById(req.params.id);
+    const userContact = await Contact.findById(req.params.id);
     if (!userContact) {
         return res.status(404).json({ message: "No contact found", success: false });
     }
@@ -91,7 +91,7 @@ export const getContactByUserId = async (req, res) => {
         return res.status(403).json({ message: "Forbidden", success: false });
     }
 
-    const userContact = await contact.find({ user: req.params.id });
+    const userContact = await Contact.find({ user: req.params.id });
     if (userContact.length === 0) {
         return res.status(404).json({ message: "No contact found", success: false });
     }
