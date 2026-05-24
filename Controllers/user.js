@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
-  if (name == "" || email == "" || password == "")
+  if (!name || !email || !password )
     return res.json({ message: "All feilds are required" });
 
   let user = await User.findOne({ email });
@@ -22,7 +22,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  if (email == "" || password == "")
+  if (!email  || !password )
     return res.json({ message: "All feilds are required" });
 
   const user = await User.findOne({ email });
