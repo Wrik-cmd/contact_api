@@ -6,7 +6,7 @@ export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password )
-    return res.json({ message: "All feilds are required" });
+    return res.json({ message: "All fields are required" });
 
   let user = await User.findOne({ email });
   if (user)
@@ -23,7 +23,7 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email  || !password )
-    return res.json({ message: "All feilds are required" });
+    return res.json({ message: "All fields are required",success:false });
 
   const user = await User.findOne({ email });
 
@@ -32,7 +32,7 @@ export const login = async (req, res) => {
   const validPass = await bcrypt.compare(password, user.password);
 
   if (!validPass)
-    return res.status(400).json({ message: "Invalide password", success: false });
+    return res.status(400).json({ message: "Invalid password", success: false });
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT, {
     expiresIn: "1d",

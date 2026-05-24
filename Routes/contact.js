@@ -20,6 +20,9 @@ router.post("/new", isAuthenticated, newContact);
 // get all contact
 router.get("/", getAllContact);
 
+// get user specific contact
+router.get("/userid/:id", getContactByUserId);
+
 // get contact by id
 router.get("/:id", getContactById);
 
@@ -29,7 +32,5 @@ router.put("/:id",isAuthenticated, updateContactById);
 // delete contact by id
 router.delete("/:id",isAuthenticated, deleteContactById);
 
-// get user specific contact
-router.get("/userid/:id",getContactByUserId);
 
 export default router;
