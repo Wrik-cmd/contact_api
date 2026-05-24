@@ -1,13 +1,13 @@
 import express from "express";
 import mongoose from "mongoose";
-import bodyParser from "express";
+
 import userRouter from './Routes/user.js'
 import contactRouter from './Routes/contact.js'
 import { config } from "dotenv";
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 // .evn setup
 config({path:'.env'})
